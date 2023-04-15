@@ -1,8 +1,18 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
+//tag
+const heading = $('header h2');
+//class
+const cdImg = $('.cd-thumb');
+//id
+const audio = $('#audio');
+const cd = $('.cd');
+const playBtn = $('.btn-toggle-play')
+const player = $('.player')
 
 const app = {
-    currentIndex: 0,
+    currentIndex: 3,
+    isPlaying: false,
     songs: [
         {
             name: 'Anh nhớ ra',
@@ -83,9 +93,9 @@ const app = {
     },
 
     handleEvent: function() {
-        const cd = $('.cd');
         const cdWidth = cd.offsetWidth
 
+        // Xu ly phong to thu nho CD
         document.onscroll = function () {
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
             const newWidth = cdWidth - scrollTop;
@@ -93,9 +103,35 @@ const app = {
             cd.style.width = newWidth > 0 ? newWidth + 'px' : 0
             cd.style.opacity = newWidth / cdWidth
         }
+
+        //Xu ly khi click play
+        playBtn.onclick = function() {
+            if (app.isPlaying === false) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+
+
+          // khi dang play 
+          audio.onplay = function() {
+            app.isPlaying = true;
+            player.classList.add('playing')
+          }
+
+          //khi dang pause
+          audio.onpause = function() {
+            app.isPlaying = false;
+            player.classList.remove('playing')
+          }
+        }
     },
 
     loadCurrentSong: function() {
+      
+        heading.textContent = this.currentSong.name;
+        cdImg.style.backgroundImage = `url('${this.currentSong.img}')`
+        audio.src = this.currentSong.path;
 
     },
 
@@ -106,6 +142,7 @@ const app = {
         //Xu ly cac su kien
         this.handleEvent();
 
+        //Tai thong tin bai hat dau tien
         this.loadCurrentSong();
 
         //Render playlist
