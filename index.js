@@ -9,6 +9,7 @@ const audio = $('#audio');
 const cd = $('.cd');
 const playBtn = $('.btn-toggle-play')
 const player = $('.player')
+const progress = $('#progress')
 
 const app = {
     currentIndex: 3,
@@ -125,6 +126,20 @@ const app = {
             player.classList.remove('playing')
           }
         }
+
+        //Xu ly thanh chay
+        audio.ontimeupdate = function() {
+            if (audio.duration) {
+                const songProgress = Math.floor(audio.currentTime / audio.duration * 100);
+                progress.value = songProgress;
+            }
+        }
+
+        //Xu ly tua
+       progress.onchange = function(e) {
+        const tua = e.target.value / 100 * audio.duration;
+        audio.currentTime = tua;
+       }
     },
 
     loadCurrentSong: function() {
