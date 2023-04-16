@@ -10,9 +10,15 @@ const cd = $('.cd');
 const playBtn = $('.btn-toggle-play')
 const player = $('.player')
 const progress = $('#progress')
+const nextBtn = $('.btn-next')
+const preBtn = $('.btn-prev')
+const randomBtn = $('.btn-random')
+const repeatBtn = $('.btn-repeat')
 
 const app = {
-    currentIndex: 3,
+    currentIndex: 0,
+    isRepeat: false,
+    isRandom: false,
     isPlaying: false,
     songs: [
         {
@@ -49,21 +55,6 @@ const app = {
             path: 'Song/TaiNhacHay.Biz - Chuyện Những Người Yêu Xa.mp3',
             img: 'Img/1676527903905_640.jpg'
         },
-        {
-
-        },
-
-        {
-
-        },
-
-        {
-            
-        },
-
-        {
-
-        },
     ],
     render: function() {
         const htmls = this.songs.map(song => {
@@ -94,6 +85,16 @@ const app = {
     },
 
     handleEvent: function() {
+
+        //Xu ly CD quay
+        const cdImgAni = cdImg.animate([
+            {transform: 'rotate(360deg)'}
+        ], {
+            duration: 10000, // 10s
+            iterations: Infinity,
+        })
+        cdImgAni.pause()
+
         const cdWidth = cd.offsetWidth
 
         // Xu ly phong to thu nho CD
@@ -109,8 +110,10 @@ const app = {
         playBtn.onclick = function() {
             if (app.isPlaying === false) {
                 audio.play();
+                cdImgAni.play();
             } else {
                 audio.pause();
+                cdImgAni.pause();
             }
 
 
@@ -140,6 +143,47 @@ const app = {
         const tua = e.target.value / 100 * audio.duration;
         audio.currentTime = tua;
        }
+
+       //Xu ly bai tiep theo
+       nextBtn.onclick = function() {
+        if (app.isRandom == true) {
+            app.randomSong()
+        } else {
+            app.nextSong();
+        }
+        audio.play();
+       }
+
+       //Xu ly bai truoc do
+       preBtn.onclick = function() {
+        if (app.isRandom == true) {
+            app.randomSong()
+        } else {
+            app.preSong();
+        }
+        audio.play();
+       }
+
+       //Xu ly random song
+       randomBtn.onclick = function() {
+        app.isRandom = !app.isRandom;
+        randomBtn.classList.toggle('active', app.isRandom)
+       }
+
+       //Xu ly khi audio end
+       audio.onended = function() {
+        if (app.isRepeat) {
+            audio.play();
+        } else {
+            nextBtn.click();
+        }
+       }
+
+       //Xu ly khi repeat
+       repeatBtn.onclick = function() {
+        app.isRepeat = !app.isRepeat;
+        repeatBtn.classList.toggle('active', app.isRepeat)
+       }
     },
 
     loadCurrentSong: function() {
@@ -148,6 +192,33 @@ const app = {
         cdImg.style.backgroundImage = `url('${this.currentSong.img}')`
         audio.src = this.currentSong.path;
 
+    },
+
+    nextSong: function() {
+        this.currentIndex++;
+        if (this.currentIndex >= this.songs.length) {
+            this.currentIndex = 0;
+        }
+        this.loadCurrentSong()
+    },
+
+    preSong: function() {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+            this.currentIndex = this.songs.length - 1;
+        }
+        this.loadCurrentSong()
+    },
+
+    randomSong: function() {
+        let newIndex;
+        do {
+            newIndex = Math.floor(Math.random() * this.songs.length)
+        } while (newIndex === this.currentIndex) 
+        // newIndex = currentIndex thì chạy tiếp còn ko thì dừng
+
+        this.currentIndex = newIndex;
+        this.loadCurrentSong();
     },
 
     start: function() {
