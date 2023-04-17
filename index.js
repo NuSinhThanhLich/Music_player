@@ -60,6 +60,41 @@ const app = {
             path: 'Song/TaiNhacHay.Biz - Chuyện Những Người Yêu Xa.mp3',
             img: 'Img/1676527903905_640.jpg'
         },
+
+        {
+            name: '20 năm ở thế giới',
+            singer: 'Thịnh Suy',
+            path: 'Song/20NamOTheGioi-ThinhSuy-6737307.mp3',
+            img: 'Img/20 năm ở thế giới.jpg'
+        },
+
+        {
+            name: 'Cô ta',
+            singer: 'Vũ',
+            path: 'Song/Co-Ta-Vu.mp3',
+            img: 'Img/cô ta.jpg',
+        },
+
+        {
+            name: 'It will be okay',
+            singer: 'Shawn Mendes',
+            path: 'Song/It&#34;ll Be Okay - Shawn Mendes.mp3',
+            img: 'Img/it will be okay.jpg',
+        },
+
+        {
+            name: 'Đông kiếm em',
+            singer: 'Vũ',
+            path: 'Song/DongKiemEm-ThaiVu-4373753.mp3',
+            img: 'Img/đông kiếm em.jpg',
+        },
+
+        {
+            name: 'Hành tinh song song Pt.2',
+            singer: 'Vũ',
+            path: 'Song/Hành Tinh Song Song, Pt. 2 - Vũ.mp3',
+            img: 'Img/hành tinh song song.jpg',
+        },
     ],
 
     setconfigs: function (key, value) {
