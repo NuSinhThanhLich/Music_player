@@ -9,17 +9,22 @@ const audio = $('#audio');
 const cd = $('.cd');
 const playBtn = $('.btn-toggle-play')
 const player = $('.player')
+const playlist = $('.playlist')
 const progress = $('#progress')
 const nextBtn = $('.btn-next')
 const preBtn = $('.btn-prev')
 const randomBtn = $('.btn-random')
 const repeatBtn = $('.btn-repeat')
 
+const PLAYER_STORAGE_KEY = 'MaxPro Player'
+
 const app = {
     currentIndex: 0,
     isRepeat: false,
     isRandom: false,
     isPlaying: false,
+
+    configs: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
     songs: [
         {
             name: 'Anh nhớ ra',
@@ -56,10 +61,16 @@ const app = {
             img: 'Img/1676527903905_640.jpg'
         },
     ],
+
+    setconfigs: function (key, value) {
+        this.configs[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.configs))
+    },
+
     render: function() {
-        const htmls = this.songs.map(song => {
+        const htmls = this.songs.map((song, index) => {
             return `
-            <div class="song">
+            <div class="song ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
             <div class="thumb" style="background-image: url('${song.img}')">
             </div>
             <div class="body">
@@ -73,7 +84,7 @@ const app = {
             `
         })
         
-       $('.playlist').innerHTML = htmls.join('')
+       playlist.innerHTML = htmls.join('')
     },
 
     defineProperties: function() {
@@ -152,6 +163,8 @@ const app = {
             app.nextSong();
         }
         audio.play();
+        app.render();
+        app.scrollToView()
        }
 
        //Xu ly bai truoc do
@@ -162,36 +175,71 @@ const app = {
             app.preSong();
         }
         audio.play();
+        app.render();
+        app.scrollToView();
        }
 
        //Xu ly random song
        randomBtn.onclick = function() {
         app.isRandom = !app.isRandom;
+        app.setconfigs('isRandom', app.isRandom)
         randomBtn.classList.toggle('active', app.isRandom)
-       }
-
-       //Xu ly khi audio end
-       audio.onended = function() {
-        if (app.isRepeat) {
-            audio.play();
-        } else {
-            nextBtn.click();
-        }
        }
 
        //Xu ly khi repeat
        repeatBtn.onclick = function() {
         app.isRepeat = !app.isRepeat;
+        app.setconfigs('isRepeat', app.isRepeat)
         repeatBtn.classList.toggle('active', app.isRepeat)
        }
+
+        //Xu ly khi audio end
+        audio.onended = function() {
+            if (app.isRepeat) {
+                audio.play();
+            } else {
+                nextBtn.click();
+            }
+        }
+
+         //Lang nghe hanh vi click vao playlist
+         playlist.onclick = function(e) {
+            const songNode = e.target.closest('.song:not(.active)');
+            if (songNode || e.target.closest('.option')) {
+                // Xu ly khi click vao song
+                if (songNode) {
+                    app.currentIndex = Number(songNode.dataset.index)
+                    app.loadCurrentSong()
+                    app.render()
+                    audio.play()
+                }
+                if (e.target.closet('.option')) {
+
+                }
+            }
+        }
+    },
+
+    scrollToView: function() {
+        setTimeout(function() {
+            $('.song.active').scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+                incline: "nearest",
+                
+            })
+        }, 300)
     },
 
     loadCurrentSong: function() {
-      
         heading.textContent = this.currentSong.name;
         cdImg.style.backgroundImage = `url('${this.currentSong.img}')`
         audio.src = this.currentSong.path;
+    },
 
+    loadConfig: function() {
+        this.isRandom = this.configs.isRandom;
+        this.isRepeat = this.configs.isRepeat;
     },
 
     nextSong: function() {
@@ -221,7 +269,11 @@ const app = {
         this.loadCurrentSong();
     },
 
+    
+
     start: function() {
+        this.loadConfig();
+
         //Dinh nghia cac thuoc tinh
         this.defineProperties();
 
@@ -233,6 +285,9 @@ const app = {
 
         //Render playlist
         this.render()
+
+        randomBtn.classList.toggle('active', app.isRandom);
+        repeatBtn.classList.toggle('active', app.isRepeat);
     }
 }
 
